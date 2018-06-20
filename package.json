@@ -1,0 +1,27 @@
+{
+  "name": "lambda-edge-helpers",
+  "version": "1.0.0",
+  "description": "Library of helper functions useful in lambda@edge",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/billykong/lambda-edge-helpers.git"
+  },
+  "keywords": [
+    "aws",
+    "lambda",
+    "edge",
+    "pipeline",
+    "functional",
+    "programming"
+  ],
+  "author": "Billy Kong",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/billykong/lambda-edge-helpers/issues"
+  },
+  "homepage": "https://github.com/billykong/lambda-edge-helpers#readme"
+}
