@@ -20,7 +20,7 @@ const getHeaders = function(conn) {
 }
 
 const pipeline =  function(...fns) {
-  return fns.length > 1 ? fns.reduce((result, f) => (...args) => f(result(...args))) : fns[0];
+  return fns.length > 1 ? fns.reduce((result, f) => (...args) => f(await result(...args))) : fns[0];
 }
 
 const abAssignment = function(conn, ...grps) {
