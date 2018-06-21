@@ -24,7 +24,36 @@ const pipeline =  function(...fns) {
 }
 
 const abAssignment = function(conn, ...grps) {
+  /*
+    let experimentUri;
+    if (headers.cookie) {
+        for (let i = 0; i < headers.cookie.length; i++) {
+            if (headers.cookie[i].value.indexOf(cookieExperimentA) >= 0) {
+                console.log('Experiment A cookie found');
+                experimentUri = pathExperimentA;
+                break;
+            } else if (headers.cookie[i].value.indexOf(cookieExperimentB) >= 0) {
+                console.log('Experiment B cookie found');
+                experimentUri = pathExperimentB;
+                break;
+            }
+        }
+    }
 
+    if (!experimentUri) {
+        console.log('Experiment cookie has not been found. Throwing dice...');
+        if (Math.random() < 0.75) {
+            experimentUri = pathExperimentA;
+        } else {
+            experimentUri = pathExperimentB;
+        }
+    }
+
+    request.uri = experimentUri;
+    console.log(`Request uri set to "${request.uri}"`);
+    callback(null, request);
+  */
+  
 }
 
 const respondsOnAssets = function(conn) {
