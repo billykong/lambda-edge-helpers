@@ -6,6 +6,14 @@
   }
 */
 
+const constructConnection = function(event, context, callback) {
+  return {
+    event: event,
+    context: context,
+    callback: callback
+  }
+}
+
 const getRequest = function(conn) {
   return conn.event.Records[0].cf.request;
 }
@@ -20,7 +28,18 @@ const getHeaders = function(conn) {
 }
 
 const pipeline =  function(...fns) {
-  return fns.length > 1 ? fns.reduce((result, f) => (...args) => f(await result(...args))) : fns[0];
+  if (fns.length > 1) {
+    return fns.reduce(async (result, f) => async (...args) => {
+      return await f(await result(...args));
+    });
+  } else {
+    return fns[0];
+  }
+  // return fns.length > 1 ? fns.reduce((result, f) => (...args) => f(await result(...args))) : fns[0];
+}
+
+const pipelineSync =  function(fns) {
+  return fns.length > 1 ? fns.reduce((result, f) => (args) => f(result(args))) : fns[0];
 }
 
 const abAssignment = function(conn, ...grps) {
@@ -72,7 +91,7 @@ const respondsOnAssets = function(conn) {
   async handler::(uri:string) -> (meta:string)
   meta:string `<meta property="og:url" content="${uri}"> <meta property="og:title" content="${title}">`
 */
-const populateMeta = function(conn, handler) {
+const populateMeta = async function(handler, conn) {
   let metaTags = await handler(getRequest(conn).uri);
   let response = getResponse(conn);
   let body = response.body;
@@ -82,13 +101,32 @@ const populateMeta = function(conn, handler) {
   if (matches) {
     response.body = body.replace(matches[0], metaTags)
   }
+  return conn;
+}
+
+const respond = function(conn) {
+  conn.callback(null, getRequest(conn));
+  return conn;
+}
+
+const logger = function(fn) {
+  return async function(args) {
+    console.log(`${fn.name} args: \n${JSON.stringify(args, null, 2)}\n`);
+    let result = await fn(args);
+    console.log(`${fn.name} result: \n${JSON.stringify(result, null, 2)}\n`);
+    return result;
+  }
 }
 
 
 
 module.exports = {
+  constructConnection: constructConnection,
   pipeline: pipeline,
+  pipelineSync: pipelineSync,
   abAssignment: abAssignment,
   respondsOnAssets: respondsOnAssets,
-  populateMeta: populateMeta
+  populateMeta: populateMeta,
+  respond: respond,
+  logger: logger 
 };
