@@ -27,20 +27,20 @@ const getHeaders = function(conn) {
   return request.headers;
 }
 
-const pipeline =  function(...fns) {
-  if (fns.length > 1) {
-    return fns.reduce(async (result, f) => async (...args) => {
-      return await f(await result(...args));
-    });
-  } else {
-    return fns[0];
-  }
-  // return fns.length > 1 ? fns.reduce((result, f) => (...args) => f(await result(...args))) : fns[0];
-}
+// const pipeline =  function(...fns) {
+//   if (fns.length > 1) {
+//     return fns.reduce(async (result, f) => async (...args) => {
+//       return await f(await result(...args));
+//     });
+//   } else {
+//     return fns[0];
+//   }
+//   // return fns.length > 1 ? fns.reduce((result, f) => (...args) => f(await result(...args))) : fns[0];
+// }
 
-const pipelineSync =  function(fns) {
-  return fns.length > 1 ? fns.reduce((result, f) => (args) => f(result(args))) : fns[0];
-}
+// const pipelineSync =  function(fns) {
+//   return fns.length > 1 ? fns.reduce((result, f) => (args) => f(result(args))) : fns[0];
+// }
 
 const abAssignment = function(conn, ...grps) {
   /*
@@ -122,8 +122,6 @@ const logger = function(fn) {
 
 module.exports = {
   constructConnection: constructConnection,
-  pipeline: pipeline,
-  pipelineSync: pipelineSync,
   abAssignment: abAssignment,
   respondsOnAssets: respondsOnAssets,
   populateMeta: populateMeta,
