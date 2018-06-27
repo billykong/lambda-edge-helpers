@@ -15,11 +15,20 @@ const constructConnection = function(event, context, callback) {
 }
 
 const getRequest = function(conn) {
-  return conn.event.Records[0].cf.request;
+  let request = conn.event.Records[0].cf.request;
+  console.log(request);
+  return request;
 }
 
 const getResponse = function(conn) {
-  return conn.event.Records[0].cf.response;
+  let response = conn.event.Records[0].cf.response;
+  console.log(response);
+  return response;
+}
+
+const setResponse = function(response, conn) {
+  conn.event.Records[0].cf.response = response;
+  return conn;
 }
 
 const getHeaders = function(conn) {
@@ -27,64 +36,19 @@ const getHeaders = function(conn) {
   return request.headers;
 }
 
-// const pipeline =  function(...fns) {
-//   if (fns.length > 1) {
-//     return fns.reduce(async (result, f) => async (...args) => {
-//       return await f(await result(...args));
-//     });
-//   } else {
-//     return fns[0];
-//   }
-//   // return fns.length > 1 ? fns.reduce((result, f) => (...args) => f(await result(...args))) : fns[0];
-// }
 
-// const pipelineSync =  function(fns) {
-//   return fns.length > 1 ? fns.reduce((result, f) => (args) => f(result(args))) : fns[0];
-// }
-
-const abAssignment = function(conn, ...grps) {
-  /*
-    let experimentUri;
-    if (headers.cookie) {
-        for (let i = 0; i < headers.cookie.length; i++) {
-            if (headers.cookie[i].value.indexOf(cookieExperimentA) >= 0) {
-                console.log('Experiment A cookie found');
-                experimentUri = pathExperimentA;
-                break;
-            } else if (headers.cookie[i].value.indexOf(cookieExperimentB) >= 0) {
-                console.log('Experiment B cookie found');
-                experimentUri = pathExperimentB;
-                break;
-            }
-        }
-    }
-
-    if (!experimentUri) {
-        console.log('Experiment cookie has not been found. Throwing dice...');
-        if (Math.random() < 0.75) {
-            experimentUri = pathExperimentA;
-        } else {
-            experimentUri = pathExperimentB;
-        }
-    }
-
-    request.uri = experimentUri;
-    console.log(`Request uri set to "${request.uri}"`);
-    callback(null, request);
-  */
-  
-}
-
-const respondsOnAssets = function(conn) {
+const exitOnAssets = function(conn) {
   // if the request.uri has file suffix(except index.html), exit with callback
   // else set uri to index.html and continue
   let request = getRequest(conn);
   let re = /(?<!index)\.[a-z]+$/g
   let matches = re.exec(request.uri);
   if (!matches) {
-    request.uri = 'index.html';
+    return conn;
+  } else {
+    requestCallback(conn);
+    return undefined;
   }
-  conn.callback(null, request);
 }
 
 /*
@@ -95,16 +59,31 @@ const populateMeta = async function(handler, conn) {
   let metaTags = await handler(getRequest(conn).uri);
   let response = getResponse(conn);
   let body = response.body;
+  console.log('response')
+  console.log(JSON.stringify(response))
+  console.log('body: ' + body)
   // string replacement here
   let re = /<!-- %meta-section-starts% -->([^()]+)<!-- %meta-section-end% -->/g
   let matches = re.exec(body);
   if (matches) {
+    console.log('matches: ' + JSON.stringify(matches));
+    console.log('replace: ' + body.replace(matches[0], metaTags))
     response.body = body.replace(matches[0], metaTags)
   }
+  conn = setResponse(response, conn);
   return conn;
 }
 
-const respond = function(conn) {
+const responseCallback = function(conn) {
+  console.log('responseCallback');
+  console.log(getResponse(conn));
+  conn.callback(null, getResponse(conn));
+  return conn;
+}
+
+const requestCallback = function(conn) {
+  console.log('requestCallback');
+  console.log(getRequest(conn));
   conn.callback(null, getRequest(conn));
   return conn;
 }
@@ -122,9 +101,12 @@ const logger = function(fn) {
 
 module.exports = {
   constructConnection: constructConnection,
-  abAssignment: abAssignment,
-  respondsOnAssets: respondsOnAssets,
+  exitOnAssets: exitOnAssets,
   populateMeta: populateMeta,
-  respond: respond,
+  responseCallback: responseCallback,
+  requestCallback: requestCallback,
+  getRequest: getRequest,
+  getResponse: getResponse,
+  setResponse: setResponse,
   logger: logger 
 };
