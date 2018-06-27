@@ -16,13 +16,11 @@ const constructConnection = function(event, context, callback) {
 
 const getRequest = function(conn) {
   let request = conn.event.Records[0].cf.request;
-  console.log(request);
   return request;
 }
 
 const getResponse = function(conn) {
   let response = conn.event.Records[0].cf.response;
-  console.log(response);
   return response;
 }
 
@@ -59,15 +57,11 @@ const populateMeta = async function(handler, conn) {
   let metaTags = await handler(getRequest(conn).uri);
   let response = getResponse(conn);
   let body = response.body;
-  console.log('response')
-  console.log(JSON.stringify(response))
-  console.log('body: ' + body)
   // string replacement here
   let re = /<!-- %meta-section-starts% -->([^()]+)<!-- %meta-section-end% -->/g
   let matches = re.exec(body);
   if (matches) {
     console.log('matches: ' + JSON.stringify(matches));
-    console.log('replace: ' + body.replace(matches[0], metaTags))
     response.body = body.replace(matches[0], metaTags)
   }
   conn = setResponse(response, conn);
@@ -76,14 +70,12 @@ const populateMeta = async function(handler, conn) {
 
 const responseCallback = function(conn) {
   console.log('responseCallback');
-  console.log(getResponse(conn));
   conn.callback(null, getResponse(conn));
   return conn;
 }
 
 const requestCallback = function(conn) {
   console.log('requestCallback');
-  console.log(getRequest(conn));
   conn.callback(null, getRequest(conn));
   return conn;
 }
