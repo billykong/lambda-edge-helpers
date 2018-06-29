@@ -36,10 +36,10 @@ const getHeaders = function(conn) {
 
 
 const exitOnAssets = function(conn) {
-  // if the request.uri has file suffix(except index.html), exit with callback
+  // if the request.uri has file suffix, exit with callback
   // else set uri to index.html and continue
   let request = getRequest(conn);
-  let re = /(?<!index)\.[a-z]+$/g
+  let re = /\.[a-z]+$/g
   let matches = re.exec(request.uri);
   if (!matches) {
     return conn;
