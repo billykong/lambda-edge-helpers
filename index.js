@@ -53,12 +53,12 @@ const exitOnAssets = function(conn) {
   async handler::(uri:string) -> (meta:string)
   meta:string `<meta property="og:url" content="${uri}"> <meta property="og:title" content="${title}">`
 */
-const populateMeta = async function(handler, conn) {
+const populateMeta = async function(handler, matcher, conn) {
   let metaTags = await handler(getRequest(conn).uri);
   let response = getResponse(conn);
   let body = response.body;
   // string replacement here
-  let re = /<!-- %meta-section-starts% -->([^()]+)<!-- %meta-section-end% -->/g
+  let re = matcher ? matcher : /<!-- %meta-section-starts% -->([^()]+)<!-- %meta-section-end% -->/g
   let matches = re.exec(body);
   if (matches) {
     console.log('matches: ' + JSON.stringify(matches));
