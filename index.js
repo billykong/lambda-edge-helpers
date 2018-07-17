@@ -39,7 +39,7 @@ const exitOnAssets = function(conn) {
   // if the request.uri has file suffix, exit with callback
   // else set uri to index.html and continue
   let request = getRequest(conn);
-  let re = /\.[a-zA-A0-9]+$/g
+  let re = /\.[a-zA-Z0-9]+$/g
   let matches = re.exec(request.uri);
   if (!matches) {
     return conn;
