@@ -23,5 +23,8 @@
   "bugs": {
     "url": "https://github.com/billykong/lambda-edge-helpers/issues"
   },
-  "homepage": "https://github.com/billykong/lambda-edge-helpers#readme"
+  "homepage": "https://github.com/billykong/lambda-edge-helpers#readme",
+  "dependencies": {
+    "zlib": "^1.0.5"
+  }
 }
