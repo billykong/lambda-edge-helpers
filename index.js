@@ -72,9 +72,9 @@ const populateMeta = async function(handler, matcher, conn) {
 
 const compressBody = function(body, compression='gzip') {
   if (compression === 'gzip') {
-    return zlib.gzipSync(body).toString('utf8');
+    return zlib.gzipSync(body).toString('base64');
   } else if (compression === 'deflate') {
-    return zlib.deflateSync(body).toString('utf8');
+    return zlib.deflateSync(body).toString('base64');
   } else {
     return body;  // no compression
   }
@@ -82,16 +82,14 @@ const compressBody = function(body, compression='gzip') {
 
 const compressBodyInResponse = function(response) {
   response.body = compressBody(response.body)
-  response.headers['content-encoding']  = [{
-    key: 'Content-Encoding',
-    value: 'gzip'
-  }]
+  response.headers['content-encoding']  = [{key: 'Content-Encoding', value: 'gzip'}]
+  response.headers['vary'] = [{ key: 'Vary', value: 'Accept-Encoding'}];
+  response.bodyEncoding =  'base64';
   return response;
 }
 
 const responseCallback = function(conn) {
   console.log('responseCallback');
-
   conn.callback(null, compressBodyInResponse(getResponse(conn)));
   return conn;
 }
