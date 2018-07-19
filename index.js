@@ -86,6 +86,16 @@ const compressBodyInResponse = function(response) {
   response.headers['vary'] = [{ key: 'Vary', value: 'Accept-Encoding'}];
   response.bodyEncoding =  'base64';
   return response;
+
+const movePathLocaleToQuery = function(conn, supportedLocales=['en', 'zh-TW', 'tc']) {
+  let uri = getRequest(conn).uri;
+  supportedLocales.forEach(locale => {
+    if (uri.includes(`/${locale}/`)) {
+      getRequest(conn).uri = getRequest(conn).uri.replace(`/${locale}/`, '');
+      getRequest(conn).querystring = getRequest(conn).querystring + `&locale=${locale}`
+    }
+  })
+  return conn;
 }
 
 const responseCallback = function(conn) {
@@ -119,6 +129,7 @@ module.exports = {
   populateMeta: populateMeta,
   responseCallback: responseCallback,
   requestCallback: requestCallback,
+  movePathLocaleToQuery: movePathLocaleToQuery,
   getRequest: getRequest,
   getResponse: getResponse,
   setResponse: setResponse,
