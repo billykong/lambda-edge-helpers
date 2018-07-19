@@ -87,16 +87,6 @@ const compressBodyInResponse = function(response) {
   response.bodyEncoding =  'base64';
   return response;
 
-const movePathLocaleToQuery = function(conn, supportedLocales=['en', 'zh-TW', 'tc']) {
-  let uri = getRequest(conn).uri;
-  supportedLocales.forEach(locale => {
-    if (uri.includes(`/${locale}/`)) {
-      getRequest(conn).uri = getRequest(conn).uri.replace(`/${locale}/`, '');
-      getRequest(conn).querystring = getRequest(conn).querystring + `&locale=${locale}`
-    }
-  })
-  return conn;
-}
 
 const responseCallback = function(conn) {
   console.log('responseCallback');
@@ -119,6 +109,35 @@ const logger = function(fn) {
   }
 }
 
+const isLinkedInBot = function(conn) {
+  let headers = getRequest(conn).headers;
+  let agents = headers ? headers['user-agent']: undefined;
+  if (agents[0]['value'].includes('LinkedInBot/1.0')) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+const response400 = function(conn) {
+  let response = {
+    status: '400',
+    statusDescription: 'Bad Reqest',
+  };
+  conn.callback(null, response);
+}
+
+const rejectLinkedInBotWithoutQueryString = function(conn) {
+  let queryString = getRequest(conn).querystring;
+  let noQueryString = !queryString || queryString == "";
+  if (isLinkedInBot(conn) && noQueryString) {
+    response400(conn);
+  } else {
+    return conn;
+  }
+
+}
+
 
 
 
@@ -129,7 +148,7 @@ module.exports = {
   populateMeta: populateMeta,
   responseCallback: responseCallback,
   requestCallback: requestCallback,
-  movePathLocaleToQuery: movePathLocaleToQuery,
+  rejectLinkedInBotWithoutQueryString: rejectLinkedInBotWithoutQueryString,
   getRequest: getRequest,
   getResponse: getResponse,
   setResponse: setResponse,
