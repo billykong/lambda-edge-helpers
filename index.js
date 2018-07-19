@@ -86,7 +86,7 @@ const compressBodyInResponse = function(response) {
   response.headers['vary'] = [{ key: 'Vary', value: 'Accept-Encoding'}];
   response.bodyEncoding =  'base64';
   return response;
-
+}
 
 const responseCallback = function(conn) {
   console.log('responseCallback');
