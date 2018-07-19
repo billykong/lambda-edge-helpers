@@ -1,6 +1,6 @@
 {
   "name": "lambda-edge-helpers",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Library of helper functions useful in lambda@edge",
   "main": "index.js",
   "scripts": {
